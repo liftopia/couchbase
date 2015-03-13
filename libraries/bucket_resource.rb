@@ -31,6 +31,10 @@ class Chef
       	})
       end
 
+      def proxy_port(arg=nil)
+        set_or_return(:port, arg, :kind_of => Integer, :default => 11211)
+      end
+
       def replicas(arg=nil)
         set_or_return(:replicas, arg, :kind_of => [Integer, FalseClass], :default => 1, :callbacks => {
         	"must be a non-negative integer" => lambda { |replicas| !replicas || replicas > -1 },
@@ -41,6 +45,12 @@ class Chef
         set_or_return(:type, arg, :kind_of => String, :default => "couchbase", :callbacks => {
         	"must be either couchbase or memcached" => lambda { |type| %w(couchbase memcached).include? type },
       	})
+      end
+
+      def auth_type(arg=nil)
+        set_or_return(:auth_type, arg, :kind_of => String, :default => "sasl", :callbacks => {
+          "must be either sasl or none" => lambda { |type| %w(sasl none).include? type },
+        })
       end
 
       def saslpassword(arg=nil)
