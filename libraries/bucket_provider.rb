@@ -45,13 +45,24 @@ class Chef
 
       def create_params
         {
-          "authType" => "sasl",
-          "saslPassword" =>  new_resource.saslpassword,
+          "authType" => new_resource.auth_type,
           "bucketType" => new_api_type,
           "name" => new_resource.bucket,
           "ramQuotaMB" => new_memory_quota_mb,
           "replicaNumber" => new_resource.replicas || 0,
-        }
+        }.merge(sasl_params).merge(no_sasl_params)
+      end
+
+      def sasl_params
+        {
+          "saslPassword" => new_resource.saslpassword
+        }.delete_if { |_,_| new_resource.auth_type != 'sasl' }
+      end
+
+      def no_sasl_params
+        {
+          "proxyPort" => new_resource.proxy_port,
+        }.delete_if { |_,_| new_resource.auth_type != 'none' }
       end
 
       def new_api_type
